@@ -1,16 +1,23 @@
 package it.dotit.demo.controller;
 
+import java.io.IOException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.exc.StreamWriteException;
+import com.fasterxml.jackson.databind.DatabindException;
+
 import it.dotit.demo.auth.AuthenticationRequest; // Classe per la richiesta di autenticazione
 import it.dotit.demo.auth.AuthenticationResponse; // Classe per la risposta di autenticazione
 import it.dotit.demo.auth.RegisterRequest; // Classe per la richiesta di registrazione
 import it.dotit.demo.repository.UserRepository; // Repository per la gestione degli utenti
 import it.dotit.demo.service.AuthenticationService; // Servizio per gestire l'autenticazione
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor; // Lombok per generare il costruttore
 
 @RestController // Indica che questa classe gestisce le richieste REST
@@ -30,5 +37,10 @@ public class AuthenticationController {
 	@PostMapping("/login") // Mappa le richieste POST a "/login" a questo metodo
 	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
 		return ResponseEntity.ok(service.authenticate(request)); // Autentica l'utente e restituisce la risposta
+	}
+	
+	@PostMapping("/refresh-token")
+	public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws StreamWriteException, DatabindException, IOException {
+		service.refreshToken(request,response);
 	}
 }

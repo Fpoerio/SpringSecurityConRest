@@ -6,9 +6,13 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import it.dotit.demo.service.LogoutService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration // Indica che questa classe contiene configurazioni di bean
@@ -19,8 +23,10 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter; // Filtro per l'autenticazione JWT
 
     private final AuthenticationProvider authenticationProvider; // Provider di autenticazione
+    
+    private final LogoutHandler logoutHandler;
 
-    @Bean // Indica che questo metodo è un bean gestito da spring
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable()) // Disabilita la protezione CSRF
@@ -33,7 +39,12 @@ public class SecurityConfiguration {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Imposta la politica di sessione su stateless (senza stato)
             )
             .authenticationProvider(authenticationProvider) // Imposta il provider di autenticazione
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // Aggiunge il filtro JWT prima del filtro di autenticazione standard
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Aggiunge il filtro JWT prima del filtro di autenticazione standard
+            .logout()
+            .logoutUrl("/nonAutenticato/logout")
+            .addLogoutHandler(logoutHandler)
+            .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
+            
 
         return http.build(); // Costruisce e restituisce la catena di filtri di sicurezza
     }

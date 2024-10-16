@@ -1,6 +1,7 @@
 package it.dotit.demo.model;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,18 +17,15 @@ import jakarta.persistence.FetchType; // Importa l'enum per la strategia di cari
 import jakarta.persistence.GeneratedValue; // Importa l'annotazione per generazione di valore
 import jakarta.persistence.GenerationType; // Importa l'enum per le strategie di generazione
 import jakarta.persistence.Id; // Importa l'annotazione per la chiave primaria
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor; // Importa l'annotazione per generare un costruttore con tutti i parametri
 import lombok.Builder; // Importa l'annotazione per il pattern builder
 import lombok.Data; // Importa l'annotazione per generare metodi getter, setter e toString
-import lombok.Getter; // Importa l'annotazione per generare un metodo getter
 import lombok.NoArgsConstructor; // Importa l'annotazione per generare un costruttore senza parametri
-import lombok.Setter; // Importa l'annotazione per generare un metodo setter
 
 @Entity 
 @AllArgsConstructor // Genera un costruttore con tutti i parametri
 @NoArgsConstructor // Genera un costruttore senza parametri
-@Getter // Genera metodi getter per tutti i campi
-@Setter // Genera metodi setter per tutti i campi
 @Builder // Abilita il pattern builder per creare istanze di questa classe
 @Data // Genera metodi getter, setter, toString, equals e hashCode
 public class User implements UserDetails { // Implementa l'interfaccia UserDetails per l'autenticazione
@@ -37,6 +35,9 @@ public class User implements UserDetails { // Implementa l'interfaccia UserDetai
 	private Long id; // Identificatore univoco dell'utente
 	private String username; // Nome utente
 	private String password; // Password dell'utente
+	
+	@OneToMany(mappedBy = "user")
+	private List<Token> tokens;
 	
     @ElementCollection(fetch = FetchType.EAGER) // Raccoglie una collezione di elementi con caricamento eager
     @Enumerated(EnumType.STRING) // Salva il ruolo come stringa nel database

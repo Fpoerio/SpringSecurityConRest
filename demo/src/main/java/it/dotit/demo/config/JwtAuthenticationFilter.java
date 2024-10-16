@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import it.dotit.demo.repository.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // Estende O
     private final JwtService jwtService; // Servizio per gestire le operazioni relative al JWT
 
     private final UserDetailsService userDetailsService; 
+    
+    private final TokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -46,9 +49,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // Estende O
         // Controlla se il nome utente è non nullo e se non c'è già autenticazione nel contesto di sicurezza
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username); // Carica i dettagli dell'utente
-
+            var isTokenValid = tokenRepository.findByToken(jwt)
+            		.map(t -> !t.isExpired() && !t.isRevoked())
+            		.orElse(false);
             // Verifica se il token è valido per l'utente caricato
-            if(jwtService.isTokenValid(jwt, userDetails)) {
+            if(jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
                 // Crea un'istanza di UsernamePasswordAuthenticationToken per l'autenticazione
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // Aggiunge dettagli sulla richiesta all'oggetto di autenticazione

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +21,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor // Genera un costruttore per l'iniezione delle dipendenze
 public class JwtService {
 
-    private static final String SECRET_KEY = "97aabf4b92e2e29c2f13ff54a26d71c6f1d84e98a02b1cd2151e834d7b0fe817"; // Chiave segreta per la firma del JWT
-
+    //private static final String SECRET_KEY = "97aabf4b92e2e29c2f13ff54a26d71c6f1d84e98a02b1cd2151e834d7b0fe817"; // Chiave segreta per la firma del JWT
+	
+	@Value("${application.security.jwt.secret-key}")
+	private String secretKey;
+	
+	@Value("${application.security.jwt.expiration}")
+	private Long jwtExpiration;
+	
+	@Value("${application.security.jwt.refresh-token.expiration}")
+	private Long refreshExpiration;
+	
     // Estrae il nome utente dal token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject); // Utilizza il metodo di estrazione dei claim
@@ -58,6 +68,15 @@ public class JwtService {
 
     // Genera un token JWT con claim extra per un utente specifico
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildToken(extraClaims, userDetails, jwtExpiration);
+    }
+    
+    public String generateRefreshToken(UserDetails userDetails) {
+
+        return buildToken(new HashMap<>(), userDetails, jwtExpiration);
+    }
+    
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, Long expiration) {
         // Aggiunge i ruoli dell'utente ai claim extra
         extraClaims.put("roles", userDetails.getAuthorities().stream()
                 .map(grantedAuthority -> grantedAuthority.getAuthority())
@@ -67,7 +86,7 @@ public class JwtService {
                 .setClaims(extraClaims) // Imposta i claim extra
                 .setSubject(userDetails.getUsername()) // Imposta il soggetto (username)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // Imposta la data di emissione
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // Imposta la data di scadenza (24 minuti)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // Imposta la data di scadenza
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Firma il token con la chiave segreta e l'algoritmo
                 .compact(); // Genera e restituisce il token compatto
     }
@@ -84,7 +103,7 @@ public class JwtService {
 
     // Ottiene la chiave di firma a partire dalla chiave segreta
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY); // Decodifica la chiave segreta da Base64
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey); // Decodifica la chiave segreta da Base64
         return Keys.hmacShaKeyFor(keyBytes); // Restituisce la chiave per la firma HMAC
     }
 }
