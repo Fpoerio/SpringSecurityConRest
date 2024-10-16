@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+//Classe per richiesta di autenticazione
 @Data
 @Builder
 @AllArgsConstructor

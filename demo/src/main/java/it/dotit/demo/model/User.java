@@ -4,51 +4,49 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority; // Importa l'interfaccia per le autorità concesse
+import org.springframework.security.core.authority.SimpleGrantedAuthority; // Importa l'implementazione di GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails; // Importa l'interfaccia UserDetails
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.ElementCollection; // Importa l'annotazione per collezioni di elementi
+import jakarta.persistence.Entity; // Importa l'annotazione per definire un'entità JPA
+import jakarta.persistence.EnumType; // Importa l'enum per specificare il tipo di enumerazione
+import jakarta.persistence.Enumerated; // Importa l'annotazione per il mapping di enumerazioni
+import jakarta.persistence.FetchType; // Importa l'enum per la strategia di caricamento
+import jakarta.persistence.GeneratedValue; // Importa l'annotazione per generazione di valore
+import jakarta.persistence.GenerationType; // Importa l'enum per le strategie di generazione
+import jakarta.persistence.Id; // Importa l'annotazione per la chiave primaria
+import lombok.AllArgsConstructor; // Importa l'annotazione per generare un costruttore con tutti i parametri
+import lombok.Builder; // Importa l'annotazione per il pattern builder
+import lombok.Data; // Importa l'annotazione per generare metodi getter, setter e toString
+import lombok.Getter; // Importa l'annotazione per generare un metodo getter
+import lombok.NoArgsConstructor; // Importa l'annotazione per generare un costruttore senza parametri
+import lombok.Setter; // Importa l'annotazione per generare un metodo setter
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder
-@Data
-public class User implements UserDetails{
+@Entity 
+@AllArgsConstructor // Genera un costruttore con tutti i parametri
+@NoArgsConstructor // Genera un costruttore senza parametri
+@Getter // Genera metodi getter per tutti i campi
+@Setter // Genera metodi setter per tutti i campi
+@Builder // Abilita il pattern builder per creare istanze di questa classe
+@Data // Genera metodi getter, setter, toString, equals e hashCode
+public class User implements UserDetails { // Implementa l'interfaccia UserDetails per l'autenticazione
+
+	@Id // Indica che questo campo è la chiave primaria
+	@GeneratedValue(strategy = GenerationType.IDENTITY) // Genera il valore in modo incrementale
+	private Long id; // Identificatore univoco dell'utente
+	private String username; // Nome utente
+	private String password; // Password dell'utente
 	
-
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long id;
-	private String username;
-	private String password;
-	
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER) // Raccoglie una collezione di elementi con caricamento eager
     @Enumerated(EnumType.STRING) // Salva il ruolo come stringa nel database
-    private Set<Role> roles;
+    private Set<Role> roles; // Ruoli dell'utente (es. ADMIN, USER)
 	
-    @Override
+    @Override // Sovrascrive il metodo di UserDetails
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Converte i ruoli in GrantedAuthority per la gestione della sicurezza
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name())) // Converti i ruoli in GrantedAuthority
-                .collect(Collectors.toSet());
+                .map(role -> new SimpleGrantedAuthority(role.name())) // Converti ogni ruolo in un'istanza di SimpleGrantedAuthority
+                .collect(Collectors.toSet()); // Raccoglie e restituisce come set
     }
-	
-	
 }

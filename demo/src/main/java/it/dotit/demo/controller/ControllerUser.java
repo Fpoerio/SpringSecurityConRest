@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping; // Importa l'anno
 import org.springframework.web.bind.annotation.RestController; // Importa l'annotazione per definire un controller REST
 
 @RestController // Indica che questa classe gestisce le richieste REST
-@RequestMapping("/admin") // Mappa le richieste a questo controller a partire dal prefisso "/admin"
-public class ControllerAdmin {
+@RequestMapping("/user") // Mappa le richieste a questo controller a partire dal prefisso "/autenticato"
+public class ControllerUser {
 
-	@GetMapping("/sayHello") // Mappa le richieste GET a "/admin/sayHello" a questo metodo
+	@GetMapping("/sayHello") // Mappa le richieste GET a "/user/sayHello" a questo metodo
 	public ResponseEntity<String> sayHello() {
-		// Restituisce una risposta HTTP con un messaggio di benvenuto per gli utenti autenticati come admin
-		return ResponseEntity.ok("hello from secured endpoint from admin");
+		// Restituisce una risposta HTTP con un messaggio di benvenuto per gli utenti autenticati
+		return ResponseEntity.ok("hello from secured endpoint for users");
 	}
 }

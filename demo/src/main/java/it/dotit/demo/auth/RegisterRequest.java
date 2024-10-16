@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//classe per richiesta di registrazione
 @Data
 @Builder
 @AllArgsConstructor
