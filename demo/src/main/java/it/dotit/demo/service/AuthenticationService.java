@@ -7,10 +7,7 @@ import java.util.Set; // Importa l'interfaccia Set per gestire collezioni di ogg
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager; // Importa l'interfaccia per la gestione dell'autenticazione
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Importa la classe per rappresentare una richiesta di autenticazione
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder; // Importa l'interfaccia per la codifica delle password
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service; // Importa l'annotazione Service per indicare che è un servizio
 
 import com.fasterxml.jackson.core.exc.StreamWriteException;

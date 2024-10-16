@@ -73,7 +73,7 @@ public class JwtService {
     
     public String generateRefreshToken(UserDetails userDetails) {
 
-        return buildToken(new HashMap<>(), userDetails, jwtExpiration);
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
     
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, Long expiration) {
@@ -86,7 +86,7 @@ public class JwtService {
                 .setClaims(extraClaims) // Imposta i claim extra
                 .setSubject(userDetails.getUsername()) // Imposta il soggetto (username)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // Imposta la data di emissione
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // Imposta la data di scadenza
+                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Imposta la data di scadenza
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Firma il token con la chiave segreta e l'algoritmo
                 .compact(); // Genera e restituisce il token compatto
     }
