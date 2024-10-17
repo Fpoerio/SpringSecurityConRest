@@ -14,33 +14,33 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import it.dotit.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-@Configuration // Indica che questa classe contiene configurazioni di bean
-@RequiredArgsConstructor // Genera un costruttore per l'iniezione delle dipendenze
+@Configuration // Indica che questa classe fornisce configurazioni per i bean di Spring
+@RequiredArgsConstructor // Genera un costruttore per l'iniezione delle dipendenze dei campi finali
 public class ApplicationConfig {
 
     private final UserRepository userRepository; // Repository per accedere ai dati degli utenti
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService()); // Imposta il servizio per il recupero dei dettagli utente
-        authProvider.setPasswordEncoder(passwordEncoder()); // Imposta l'encoder per la codifica delle password
-        return authProvider; // Restituisce il provider di autenticazione
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(); // Crea un'istanza di DaoAuthenticationProvider
+        authProvider.setUserDetailsService(userDetailsService()); // Imposta il UserDetailsService per recuperare i dettagli dell'utente
+        authProvider.setPasswordEncoder(passwordEncoder()); // Imposta il PasswordEncoder per la codifica delle password
+        return authProvider; // Restituisce il provider di autenticazione configurato
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager(); // Restituisce il gestore di autenticazione configurato
+        return config.getAuthenticationManager(); // Recupera e restituisce il AuthenticationManager dalla configurazione fornita
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Restituisce un encoder per le password basato su BCrypt
+        return new BCryptPasswordEncoder(); // Crea e restituisce un BCryptPasswordEncoder per l'hashing delle password
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username) // Cerca l'utente nel repository
-                .orElseThrow(() -> new UsernameNotFoundException("user not found")); // Lancia un'eccezione se non trovato
+        return username -> userRepository.findByUsername(username) // Recupera l'utente per nome utente dal repository
+                .orElseThrow(() -> new UsernameNotFoundException("utente non trovato")); // Lancia un'eccezione se l'utente non viene trovato
     }
 }

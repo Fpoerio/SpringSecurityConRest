@@ -1,75 +1,73 @@
-package it.dotit.demo.service; // Pacchetto per i servizi 
+package it.dotit.demo.service; // Pacchetto per i servizi
 
-import java.io.IOException;
-import java.util.HashSet; // Importa la classe HashSet per creare un insieme di ruoli
-import java.util.Set; // Importa l'interfaccia Set per gestire collezioni di oggetti unici
+import java.io.IOException; // Importa IOException per gestire eccezioni I/O
+import java.util.HashSet; // Importa HashSet per collezioni di oggetti unici
+import java.util.Set; // Importa Set per gestire collezioni di oggetti unici
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.AuthenticationManager; // Importa l'interfaccia per la gestione dell'autenticazione
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Importa la classe per rappresentare una richiesta di autenticazione
-import org.springframework.security.crypto.password.PasswordEncoder; // Importa l'interfaccia per la codifica delle password
-import org.springframework.stereotype.Service; // Importa l'annotazione Service per indicare che è un servizio
+import org.springframework.http.HttpHeaders; // Importa HttpHeaders per gestire le intestazioni delle richieste
+import org.springframework.security.authentication.AuthenticationManager; // Importa per gestire l'autenticazione
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Rappresenta una richiesta di autenticazione
+import org.springframework.security.crypto.password.PasswordEncoder; // Per la codifica delle password
+import org.springframework.stereotype.Service; // Indica che questa classe è un servizio
 
-import com.fasterxml.jackson.core.exc.StreamWriteException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.exc.StreamWriteException; // Eccezione per scrittura su flussi
+import com.fasterxml.jackson.databind.DatabindException; // Eccezione per problemi di binding
+import com.fasterxml.jackson.databind.ObjectMapper; // Per la serializzazione/deserializzazione di oggetti
 
-import it.dotit.demo.auth.AuthenticationRequest; // Importa la classe per la richiesta di autenticazione
-import it.dotit.demo.auth.AuthenticationResponse; // Importa la classe per la risposta all'autenticazione
-import it.dotit.demo.auth.RegisterRequest; // Importa la classe per la richiesta di registrazione
-import it.dotit.demo.config.JwtService; // Importa il servizio JWT per la generazione dei token
-import it.dotit.demo.model.Role; // Importa la classe Role per gestire i ruoli degli utenti
-import it.dotit.demo.model.Token;
-import it.dotit.demo.model.TokenType;
-import it.dotit.demo.model.User; // Importa la classe User per rappresentare gli utenti
-import it.dotit.demo.repository.TokenRepository;
-import it.dotit.demo.repository.UserRepository; // Importa la repository degli utenti
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor; // Importa l'annotazione per la generazione automatica del costruttore
+import it.dotit.demo.auth.AuthenticationRequest; // Classe per la richiesta di autenticazione
+import it.dotit.demo.auth.AuthenticationResponse; // Classe per la risposta di autenticazione
+import it.dotit.demo.auth.RegisterRequest; // Classe per la richiesta di registrazione
+import it.dotit.demo.config.JwtService; // Servizio per generare e validare token JWT
+import it.dotit.demo.model.Role; // Classe per gestire i ruoli degli utenti
+import it.dotit.demo.model.Token; // Classe per rappresentare i token
+import it.dotit.demo.model.TokenType; // Tipo di token (es. BEARER)
+import it.dotit.demo.model.User; // Classe per rappresentare gli utenti
+import it.dotit.demo.repository.TokenRepository; // Repository per gestire i token
+import it.dotit.demo.repository.UserRepository; // Repository per gestire gli utenti
+import jakarta.servlet.http.HttpServletRequest; // Per gestire le richieste HTTP
+import jakarta.servlet.http.HttpServletResponse; // Per gestire le risposte HTTP
+import lombok.RequiredArgsConstructor; // Genera un costruttore per le dipendenze
 
-// Annotazione per indicare che questa classe è un servizio
-@Service
-@RequiredArgsConstructor // Genera un costruttore con parametri per le dipendenze final
+@Service // Indica che questa classe è un servizio e sarà gestita da Spring
+@RequiredArgsConstructor // Crea un costruttore con parametri per le dipendenze final
 public class AuthenticationService {
 
 	private final UserRepository repository; // Repository per accedere ai dati degli utenti
 	
 	private final PasswordEncoder passwordEncoder; // Codificatore per le password
 	
-	private final TokenRepository tokenRepository;
+	private final TokenRepository tokenRepository; // Repository per gestire i token
 	
-	private final JwtService jwtService; // Servizio per la generazione e validazione dei token JWT
+	private final JwtService jwtService; // Servizio per gestire token JWT
 	
 	private final AuthenticationManager authenticationManager; // Gestore per le operazioni di autenticazione
 	
 	// Metodo per registrare un nuovo utente
 	public AuthenticationResponse register(RegisterRequest request) {
-		if(!repository.existsByUsername(request.getUsername())) {
-			Set<Role> roles = new HashSet<>(); // Crea un nuovo insieme di ruoli
-		    roles.add(Role.USER); // Aggiunge il ruolo USER all'insieme
+		if(!repository.existsByUsername(request.getUsername())) { // Verifica se l'utente esiste già
+			Set<Role> roles = new HashSet<>(); // Crea un insieme per i ruoli
+		    roles.add(Role.USER); // Aggiunge il ruolo USER
 			User us = User.builder() // Costruisce un nuovo oggetto User
 					.username(request.getUsername()) // Imposta il nome utente
-					.password(passwordEncoder.encode(request.getPassword())) // Codifica e imposta la password
+					.password(passwordEncoder.encode(request.getPassword())) // Imposta e codifica la password
 					.roles(roles) // Imposta i ruoli dell'utente
 					.build(); // Costruisce l'oggetto User
 			
-			var savedUser = repository.save(us); // Salva l'utente nel repository
-			String jwtToken = jwtService.generateToken(us); // Genera un token JWT per l'utente
-			saveUserToken(savedUser, jwtToken);
-			String refreshToken = jwtService.generateRefreshToken(us);
+			var savedUser = repository.save(us); // Salva l'utente nel database
+			String jwtToken = jwtService.generateToken(us); // Genera un token JWT
+			saveUserToken(savedUser, jwtToken); // Salva il token dell'utente
+			String refreshToken = jwtService.generateRefreshToken(us); // Genera un refresh token
 			return AuthenticationResponse.builder() // Costruisce la risposta di autenticazione
 					.accessToken(jwtToken) // Imposta il token nella risposta
-						.refreshToken(refreshToken)
+					.refreshToken(refreshToken) // Imposta il refresh token nella risposta
 					.build(); // Costruisce l'oggetto AuthenticationResponse			
 		}else {
-			return null;
+			return null; // Restituisce null se l'utente esiste già
 		}
 	}
 	
 	// Metodo per autenticare un utente esistente
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
-		
 		authenticationManager.authenticate( // Esegue l'autenticazione dell'utente
 				new UsernamePasswordAuthenticationToken( // Crea un token di autenticazione
 					request.getUsername(), // Nome utente dalla richiesta
@@ -80,73 +78,72 @@ public class AuthenticationService {
 		User us = repository.findByUsername(request.getUsername()) // Trova l'utente per nome utente
 				.orElseThrow(); // Lancia un'eccezione se l'utente non esiste
 		String jwtToken = jwtService.generateToken(us); // Genera un token JWT per l'utente
-		revokeAllUserTokens(us);
-		saveUserToken(us, jwtToken);
-		String refreshToken = jwtService.generateRefreshToken(us);
+		revokeAllUserTokens(us); // Revoca i token esistenti per l'utente
+		saveUserToken(us, jwtToken); // Salva il nuovo token per l'utente
+		String refreshToken = jwtService.generateRefreshToken(us); // Genera un refresh token
 		return AuthenticationResponse.builder() // Costruisce la risposta di autenticazione
 				.accessToken(jwtToken) // Imposta il token nella risposta
-					.refreshToken(refreshToken)
+				.refreshToken(refreshToken) // Imposta il refresh token nella risposta
 				.build(); // Costruisce l'oggetto AuthenticationResponse
 	}
 	
-	
-	
-	  private void saveUserToken(User user, String jwtToken) {
-		    var token = Token.builder()
-		        .user(user)
-		        .token(jwtToken)
-		        .tokenType(TokenType.BEARER)
-		        .expired(false)
-		        .revoked(false)
-		        .build();
-		    tokenRepository.save(token);
-	  }
+	// Salva il token dell'utente nel database
+	private void saveUserToken(User user, String jwtToken) {
+		var token = Token.builder() // Costruisce un nuovo oggetto Token
+			.user(user) // Imposta l'utente associato al token
+			.token(jwtToken) // Imposta il token JWT
+			.tokenType(TokenType.BEARER) // Imposta il tipo di token
+			.expired(false) // Indica che il token non è scaduto
+			.revoked(false) // Indica che il token non è stato revocato
+			.build(); // Costruisce l'oggetto Token
+		tokenRepository.save(token); // Salva il token nel repository
+	}
 
-private void revokeAllUserTokens(User user) {
-	var validUserTokens = tokenRepository.findAllValidTokensByUser(user.getId());
-	if (validUserTokens.isEmpty())
+	// Revoca tutti i token validi per un utente
+	private void revokeAllUserTokens(User user) {
+		var validUserTokens = tokenRepository.findAllValidTokensByUser(user.getId()); // Trova i token validi per l'utente
+		if (validUserTokens.isEmpty()) // Se non ci sono token validi, esci dal metodo
 			return;
-		validUserTokens.forEach(token -> {
-			token.setExpired(true);
-			token.setRevoked(true);
+		validUserTokens.forEach(token -> { // Per ogni token valido
+			token.setExpired(true); // Marca il token come scaduto
+			token.setRevoked(true); // Marca il token come revocato
 		});
-		tokenRepository.saveAll(validUserTokens);
-}
+		tokenRepository.saveAll(validUserTokens); // Salva le modifiche ai token nel repository
+	}
 
+	// Metodo per gestire il refresh del token
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws StreamWriteException, DatabindException, IOException {
 		
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION); // Estrae l'intestazione di autorizzazione
         final String refreshToken; // Variabile per il token JWT refresh
         final String username; // Variabile per il nome utente
         
-        //Questo consente a richieste non autenticate di raggiungere altre parti dell'applicazione, come pagine pubbliche o endpoint che non richiedono autenticazione.
         // Controlla se l'intestazione non è presente oppure non inizia con "Bearer "
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
+            return; // Se non valido, esci dal metodo 
         }
        
-        refreshToken = authHeader.substring(7); // Estrae il token JWT dalla stringa dell'intestazione (dopo "Bearer ")
+        refreshToken = authHeader.substring(7); // Estrae il token JWT dall'intestazione (dopo "Bearer ")
         username = jwtService.extractUsername(refreshToken); // Estrae il nome utente dal token JWT
 
-        // Controlla se il nome utente è non nullo e se non c'è già autenticazione nel contesto di sicurezza
+        // Se il nome utente è non nullo e l'utente non è già autenticato
         if(username != null) {
             var user =  this.repository.findByUsername(username).orElseThrow(); // Carica i dettagli dell'utente
             
             // Verifica se il token è valido per l'utente caricato
             if(jwtService.isTokenValid(refreshToken, user)) {
             	
-            	var accessToken = jwtService.generateToken(user);
+            	var accessToken = jwtService.generateToken(user); // Genera un nuovo token JWT
             	
-                revokeAllUserTokens(user);
-                saveUserToken(user,accessToken);
+                revokeAllUserTokens(user); // Revoca tutti i token validi per l'utente
+                saveUserToken(user, accessToken); // Salva il nuovo token per l'utente
             	
-            	var authResponse = AuthenticationResponse.builder()
-            				.accessToken(accessToken)
-            				.refreshToken(refreshToken)
-            				.build();
-            	new ObjectMapper().writeValue(response.getOutputStream(), authResponse);			
+            	var authResponse = AuthenticationResponse.builder() // Costruisce la risposta di autenticazione
+            				.accessToken(accessToken) // Imposta il nuovo token nella risposta
+            				.refreshToken(refreshToken) // Mantiene il refresh token nella risposta
+            				.build(); // Costruisce l'oggetto AuthenticationResponse
+            	new ObjectMapper().writeValue(response.getOutputStream(), authResponse); // Scrive la risposta nel flusso di output
             }
         }
-		
 	}
 }

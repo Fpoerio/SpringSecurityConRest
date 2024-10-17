@@ -11,34 +11,36 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
 
-import it.dotit.demo.auth.AuthenticationRequest; // Classe per la richiesta di autenticazione
-import it.dotit.demo.auth.AuthenticationResponse; // Classe per la risposta di autenticazione
-import it.dotit.demo.auth.RegisterRequest; // Classe per la richiesta di registrazione
-import it.dotit.demo.service.AuthenticationService; // Servizio per gestire l'autenticazione
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor; // Lombok per generare il costruttore
+import it.dotit.demo.auth.AuthenticationRequest; // Classe che rappresenta la richiesta di autenticazione
+import it.dotit.demo.auth.AuthenticationResponse; // Classe che rappresenta la risposta dopo l'autenticazione
+import it.dotit.demo.auth.RegisterRequest; // Classe che rappresenta la richiesta di registrazione
+import it.dotit.demo.service.AuthenticationService; // Servizio che gestisce la logica di autenticazione
+import jakarta.servlet.http.HttpServletRequest; // Import per gestire le richieste HTTP
+import jakarta.servlet.http.HttpServletResponse; // Import per gestire le risposte HTTP
+import lombok.RequiredArgsConstructor; // Libreria per generare automaticamente il costruttore
 
-@RestController // Indica che questa classe gestisce le richieste REST
-@RequestMapping("/nonAutenticato") // Mappa le richieste a questo controller a partire da questo prefisso
-@RequiredArgsConstructor // Genera un costruttore per l'iniezione delle dipendenze
+@RestController // Indica che la classe gestisce le richieste REST e restituisce risposte JSON
+@RequestMapping("/nonAutenticato") // Definisce il prefisso per tutte le rotte gestite da questo controller
+@RequiredArgsConstructor // Genera un costruttore per facilitare l'iniezione delle dipendenze
 public class AuthenticationController {
 
-	private final AuthenticationService service; // Servizio per gestire l'autenticazione
+	private final AuthenticationService service; // Servizio responsabile della gestione dell'autenticazione
 
-
-	@PostMapping("/registrazione") // Mappa le richieste POST a "/registrazione" a questo metodo
+	@PostMapping("/registrazione") // Mappa le richieste POST all'endpoint "/registrazione" a questo metodo
 	public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
-		return ResponseEntity.ok(service.register(request)); // Registra l'utente e restituisce la risposta, se l'utente è già esistente restituisce ok ma l'authenticationResponse sarà nulla
+		// Registra un nuovo utente e restituisce la risposta dell'autenticazione
+		return ResponseEntity.ok(service.register(request)); // Risponde con il risultato della registrazione
 	}
 
-	@PostMapping("/login") // Mappa le richieste POST a "/login" a questo metodo
+	@PostMapping("/login") // Mappa le richieste POST all'endpoint "/login" a questo metodo
 	public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-		return ResponseEntity.ok(service.authenticate(request)); // Autentica l'utente e restituisce la risposta
+		// Autentica l'utente e restituisce la risposta dell'autenticazione
+		return ResponseEntity.ok(service.authenticate(request)); // Risponde con il risultato dell'autenticazione
 	}
 	
-	@PostMapping("/refresh-token")
+	@PostMapping("/refresh-token") // Mappa le richieste POST all'endpoint "/refresh-token" a questo metodo
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws StreamWriteException, DatabindException, IOException {
-		service.refreshToken(request,response);
+		// Gestisce la logica per il rinnovo del token JWT
+		service.refreshToken(request, response); // Chiama il servizio per rinnovare il token
 	}
 }
