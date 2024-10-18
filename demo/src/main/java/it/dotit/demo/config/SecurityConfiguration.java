@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/nonAutenticato/**").permitAll() // Consente l'accesso non autenticato a questo percorso
                 .requestMatchers("/user/**").hasAuthority("USER") // Richiede l'autorità "USER" per accedere a questo percorso
                 .requestMatchers("/admin/**").hasAuthority("ADMIN") // Richiede l'autorità "ADMIN" per accedere a questo percorso
+                .requestMatchers("/shared/**").authenticated()
                 .anyRequest().authenticated() // Richiede autenticazione per tutte le altre richieste
             )
             .sessionManagement(sess -> sess

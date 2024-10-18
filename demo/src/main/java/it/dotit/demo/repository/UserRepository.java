@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository; // Importa l'annotazione Repos
 import it.dotit.demo.model.User; // Importa la classe User dal modello
 
 import java.util.Optional; // Importa la classe Optional per gestire i valori nullabili
+import java.util.List;
+
 
 // Annotazione per indicare che questa interfaccia è una repository
 @Repository
@@ -16,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> { // Interfacc
     
     // Metodo per verificare se un nome utente esiste già nel sistema, restituisce un booleano
     public boolean existsByUsername(String username);
+    
+    public User searchByUsername(String username);
 } 

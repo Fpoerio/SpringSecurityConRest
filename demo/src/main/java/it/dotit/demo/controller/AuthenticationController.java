@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import it.dotit.demo.auth.AuthenticationRequest; // Classe che rappresenta la richiesta di autenticazione
 import it.dotit.demo.auth.AuthenticationResponse; // Classe che rappresenta la risposta dopo l'autenticazione
 import it.dotit.demo.auth.RegisterRequest; // Classe che rappresenta la richiesta di registrazione
+import it.dotit.demo.model.Role;
 import it.dotit.demo.service.AuthenticationService; // Servizio che gestisce la logica di autenticazione
 import jakarta.servlet.http.HttpServletRequest; // Import per gestire le richieste HTTP
 import jakarta.servlet.http.HttpServletResponse; // Import per gestire le risposte HTTP
@@ -29,7 +30,7 @@ public class AuthenticationController {
 	@PostMapping("/registrazione") // Mappa le richieste POST all'endpoint "/registrazione" a questo metodo
 	public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
 		// Registra un nuovo utente e restituisce la risposta dell'autenticazione
-		return ResponseEntity.ok(service.register(request)); // Risponde con il risultato della registrazione
+		return ResponseEntity.ok(service.register(request, Role.USER)); // Risponde con il risultato della registrazione
 	}
 
 	@PostMapping("/login") // Mappa le richieste POST all'endpoint "/login" a questo metodo

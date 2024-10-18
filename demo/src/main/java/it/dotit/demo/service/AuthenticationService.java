@@ -2,9 +2,11 @@ package it.dotit.demo.service; // Pacchetto per i servizi
 
 import java.io.IOException; // Importa IOException per gestire eccezioni I/O
 import java.util.HashSet; // Importa HashSet per collezioni di oggetti unici
+import java.util.List;
 import java.util.Set; // Importa Set per gestire collezioni di oggetti unici
 
 import org.springframework.http.HttpHeaders; // Importa HttpHeaders per gestire le intestazioni delle richieste
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager; // Importa per gestire l'autenticazione
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Rappresenta una richiesta di autenticazione
 import org.springframework.security.crypto.password.PasswordEncoder; // Per la codifica delle password
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper; // Per la serializzazione/de
 import it.dotit.demo.auth.AuthenticationRequest; // Classe per la richiesta di autenticazione
 import it.dotit.demo.auth.AuthenticationResponse; // Classe per la risposta di autenticazione
 import it.dotit.demo.auth.RegisterRequest; // Classe per la richiesta di registrazione
+import it.dotit.demo.auth.UpdateUserRequest;
 import it.dotit.demo.config.JwtService; // Servizio per generare e validare token JWT
 import it.dotit.demo.model.Role; // Classe per gestire i ruoli degli utenti
 import it.dotit.demo.model.Token; // Classe per rappresentare i token
@@ -42,11 +45,62 @@ public class AuthenticationService {
 	
 	private final AuthenticationManager authenticationManager; // Gestore per le operazioni di autenticazione
 	
+	
+	
+    // Metodo per l'admin per aggiornare un utente
+    public ResponseEntity<String> updateUserByAdmin(UpdateUserRequest request) {
+        User userToUpdate = repository.searchByUsername(request.getOldUsername());
+        
+        if(userToUpdate==null) {
+        	return ResponseEntity.ok("utente non trovato");
+        }
+
+        // Revoca tutti i token esistenti per l'utente da aggiornare
+        revokeAllUserTokens(userToUpdate); // Revoca i token esistenti
+
+        // Aggiorna username se fornito
+        if (request.getUsername() != null && !request.getUsername().isEmpty()) {
+            userToUpdate.setUsername(request.getUsername());
+        }
+
+        // Aggiorna password se fornita
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+        	userToUpdate.setPassword(passwordEncoder.encode(request.getPassword())); // Codifica la nuova password
+        }
+
+        repository.save(userToUpdate); // Salva l'utente aggiornato nel database
+
+        return ResponseEntity.ok("utente modificato");
+	}
+
+    // Metodo per un utente normale per aggiornare se stesso
+    public ResponseEntity<String> updateSelf(UpdateUserRequest request, HttpServletRequest httpRequest) {
+        String authHeader = httpRequest.getHeader(HttpHeaders.AUTHORIZATION); // Estrae l'intestazione di autorizzazione
+
+        String jwtToken = authHeader.substring(7); // Estrae il token JWT dall'intestazione
+        String currentUserUsername = jwtService.extractUsername(jwtToken); // Estrae l'username dal token
+        
+        User currentUser = repository.searchByUsername(currentUserUsername);
+
+
+        // Richiama il metodo dell'admin per aggiornare l'utente
+        UpdateUserRequest userUpdateRequest = new UpdateUserRequest();
+        userUpdateRequest.setUsername(request.getUsername());
+        userUpdateRequest.setPassword(request.getPassword());
+        userUpdateRequest.setOldUsername(currentUser.getUsername());
+
+        return updateUserByAdmin(userUpdateRequest);
+    }
+	
+	
+	
+	
+	
 	// Metodo per registrare un nuovo utente
-	public AuthenticationResponse register(RegisterRequest request) {
+	public AuthenticationResponse register(RegisterRequest request, Role role) {
 		if(!repository.existsByUsername(request.getUsername())) { // Verifica se l'utente esiste già
 			Set<Role> roles = new HashSet<>(); // Crea un insieme per i ruoli
-		    roles.add(Role.USER); // Aggiunge il ruolo USER
+		    roles.add(role); // Aggiunge il ruolo USER
 			User us = User.builder() // Costruisce un nuovo oggetto User
 					.username(request.getUsername()) // Imposta il nome utente
 					.password(passwordEncoder.encode(request.getPassword())) // Imposta e codifica la password
