@@ -7,7 +7,10 @@ import it.dotit.demo.model.Csv;
 
 
 
+
 @Repository
 public interface CsvRepository extends JpaRepository<Csv,Long> {
 
+
+    public Csv searchByIdMio(Long idMio);
 }

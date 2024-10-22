@@ -1,11 +1,11 @@
 package it.dotit.demo.controller;
 
-import org.springframework.http.ResponseEntity; // Importa la classe per gestire le risposte HTTP
-import org.springframework.web.bind.annotation.GetMapping; // Importa l'annotazione per gestire le richieste GET
+import org.springframework.http.ResponseEntity; 
+import org.springframework.web.bind.annotation.GetMapping; 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping; // Importa l'annotazione per definire il percorso delle richieste
-import org.springframework.web.bind.annotation.RestController; // Importa l'annotazione per creare un controller REST
+import org.springframework.web.bind.annotation.RequestMapping; 
+import org.springframework.web.bind.annotation.RestController; 
 
 import it.dotit.demo.auth.UpdateUserRequest;
 import it.dotit.demo.service.AuthenticationService;

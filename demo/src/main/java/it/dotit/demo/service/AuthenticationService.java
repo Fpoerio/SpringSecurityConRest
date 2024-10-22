@@ -2,7 +2,6 @@ package it.dotit.demo.service; // Pacchetto per i servizi
 
 import java.io.IOException; // Importa IOException per gestire eccezioni I/O
 import java.util.HashSet; // Importa HashSet per collezioni di oggetti unici
-import java.util.List;
 import java.util.Set; // Importa Set per gestire collezioni di oggetti unici
 
 import org.springframework.http.HttpHeaders; // Importa HttpHeaders per gestire le intestazioni delle richieste

@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
 
-import it.dotit.demo.auth.AuthenticationRequest; // Classe che rappresenta la richiesta di autenticazione
-import it.dotit.demo.auth.AuthenticationResponse; // Classe che rappresenta la risposta dopo l'autenticazione
-import it.dotit.demo.auth.RegisterRequest; // Classe che rappresenta la richiesta di registrazione
+import it.dotit.demo.auth.AuthenticationRequest; 
+import it.dotit.demo.auth.AuthenticationResponse; 
+import it.dotit.demo.auth.RegisterRequest; 
 import it.dotit.demo.model.Role;
-import it.dotit.demo.service.AuthenticationService; // Servizio che gestisce la logica di autenticazione
-import jakarta.servlet.http.HttpServletRequest; // Import per gestire le richieste HTTP
-import jakarta.servlet.http.HttpServletResponse; // Import per gestire le risposte HTTP
-import lombok.RequiredArgsConstructor; // Libreria per generare automaticamente il costruttore
+import it.dotit.demo.service.AuthenticationService; 
+import jakarta.servlet.http.HttpServletRequest; 
+import jakarta.servlet.http.HttpServletResponse; 
+import lombok.RequiredArgsConstructor; 
 
 @RestController // Indica che la classe gestisce le richieste REST e restituisce risposte JSON
 @RequestMapping("/nonAutenticato") // Definisce il prefisso per tutte le rotte gestite da questo controller

@@ -1,13 +1,12 @@
-package it.dotit.demo.repository; // Pacchetto per la repository degli utenti
+package it.dotit.demo.repository; 
 
-import org.springframework.data.jpa.repository.JpaRepository; // Importa l'interfaccia JpaRepository per le operazioni CRUD
+import org.springframework.data.jpa.repository.JpaRepository; 
 
-import org.springframework.stereotype.Repository; // Importa l'annotazione Repository per indicare che è una classe di accesso ai dati
+import org.springframework.stereotype.Repository; 
 
-import it.dotit.demo.model.User; // Importa la classe User dal modello
+import it.dotit.demo.model.User; 
 
-import java.util.Optional; // Importa la classe Optional per gestire i valori nullabili
-import java.util.List;
+import java.util.Optional; 
 
 
 // Annotazione per indicare che questa interfaccia è una repository
