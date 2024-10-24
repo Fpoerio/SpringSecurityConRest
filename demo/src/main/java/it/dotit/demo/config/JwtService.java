@@ -1,3 +1,4 @@
+//OK
 package it.dotit.demo.config;
 
 import java.security.Key;
@@ -17,32 +18,35 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 
-@Service // Indica che questa classe è un servizio gestito da Spring, utile per la logica di business
+@Service // Indica che questa classe è un servizio gestito da Spring, utile per la logica
+         // di business
 @RequiredArgsConstructor // Genera un costruttore per l'iniezione delle dipendenze necessarie
 public class JwtService {
 
-    // La chiave segreta per firmare il token JWT, letta dalle proprietà dell'applicazione
-	@Value("${application.security.jwt.secret-key}")
-	private String secretKey;
-	
-	@Value("${application.security.jwt.expiration}") // Tempo di scadenza del token
-	private Long jwtExpiration;
-	
-	@Value("${application.security.jwt.refresh-token.expiration}") // Tempo di scadenza del refresh token
-	private Long refreshExpiration;
-	
+    // La chiave segreta per firmare il token JWT, letta dalle proprietà
+    // dell'applicazione
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${application.security.jwt.expiration}") // Tempo di scadenza del token
+    private Long jwtExpiration;
+
+    @Value("${application.security.jwt.refresh-token.expiration}") // Tempo di scadenza del refresh token
+    private Long refreshExpiration;
+
     // Estrae il nome utente dal token JWT
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject); // Utilizza un metodo per estrarre claim specifici
     }
-    
+
     // Estrae un claim specifico dal token utilizzando una funzione di risoluzione
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token); // Estrae tutti i claim dal token
         return claimsResolver.apply(claims); // Applica la funzione per ottenere il claim desiderato
     }
 
-    // Genera un token JWT per un utente specifico, usando una mappa vuota per eventuali claim extra
+    // Genera un token JWT per un utente specifico, usando una mappa vuota per
+    // eventuali claim extra
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
@@ -68,12 +72,12 @@ public class JwtService {
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
-    
+
     // Genera un refresh token per un utente
     public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
-    
+
     // Costruisce e firma un token JWT, includendo i claim extra e l'utente
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, Long expiration) {
         // Aggiunge i ruoli dell'utente ai claim extra

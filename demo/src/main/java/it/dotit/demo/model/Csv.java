@@ -10,16 +10,14 @@ import com.opencsv.bean.CsvCustomBindByName; // Per la mappatura dei campi CSV c
 import jakarta.persistence.Entity; // Per indicare che la classe è un'entità JPA
 import jakarta.persistence.Id; // Per indicare la chiave primaria
 import jakarta.persistence.Table; // Per specificare il nome della tabella nel database
-import lombok.AllArgsConstructor; // Per generare un costruttore con tutti i parametri
-import lombok.Builder; // Per il pattern Builder
-import lombok.Data; // Per generare metodi comuni come toString, equals, hashCode
-import lombok.NoArgsConstructor; // Per generare un costruttore senza parametri
+import lombok.*;
 
 @Entity // Indica che la classe è un'entità JPA
 @AllArgsConstructor // Genera un costruttore che accetta tutti i campi come parametri
 @NoArgsConstructor // Genera un costruttore senza parametri
 @Builder // Abilita il pattern Builder per la creazione dell'oggetto
-@Data // Genera automaticamente i metodi getter e setter, toString, equals, e hashCode
+@Getter
+@Setter
 @Table(name="Csv") // Specifica il nome della tabella nel database
 public class Csv {
     @Id // Indica che questo campo è la chiave primaria

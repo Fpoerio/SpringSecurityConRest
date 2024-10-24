@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource; 
 import org.springframework.http.ResponseEntity;
@@ -31,15 +31,22 @@ public class CsvController {
 
     private final CsvService csvservice;
 
+    @Value("${application.pathTxt}")
+    private String pathTxt;
+
     @PostMapping("/import")
-    public String importCSV(@RequestParam String filePath) throws CsvBadConverterException, IllegalStateException, IOException{
-        csvservice.importCSV(filePath); // Assicurati che questo sia il metodo corretto
-        return "Importazione completata!";
+    public ResponseEntity<String> importCSV(@RequestParam String filePath){
+        try {
+            csvservice.importCSV(filePath); // Assicurati che questo sia il metodo corretto
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok("Importazione completata!");
     }
 
     @PostMapping("/downloadCsvEliminati")
     public ResponseEntity<Resource> fileTxt() {
-        File fileUtentiEliminati = new File("C:\\Users\\Fabio\\git\\springSecurityRest\\demo\\src\\main\\resources\\txtCsvEliminati.txt");
+        File fileUtentiEliminati = new File(pathTxt);
         if (!fileUtentiEliminati.exists()) {
             return ResponseEntity.notFound().build();
         }

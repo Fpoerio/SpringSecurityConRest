@@ -23,31 +23,32 @@ import lombok.Builder; // Importa l'annotazione per il pattern builder
 import lombok.Data; // Importa l'annotazione per generare metodi getter, setter e toString
 import lombok.NoArgsConstructor; // Importa l'annotazione per generare un costruttore senza parametri
 
-@Entity 
+@Entity
 @AllArgsConstructor // Genera un costruttore con tutti i parametri
 @NoArgsConstructor // Genera un costruttore senza parametri
 @Builder // Abilita il pattern builder per creare istanze di questa classe
 @Data // Genera metodi getter, setter, toString, equals e hashCode
 public class User implements UserDetails { // Implementa l'interfaccia UserDetails per l'autenticazione
 
-	@Id // Indica che questo campo è la chiave primaria
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // Genera il valore in modo incrementale
-	private Long id; // Identificatore univoco dell'utente
-	private String username; // Nome utente
-	private String password; // Password dell'utente
-	
-	@OneToMany(mappedBy = "user")
-	private List<Token> tokens;
-	
+    @Id // Indica che questo campo è la chiave primaria
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Genera il valore in modo incrementale
+    private Long id; // Identificatore univoco dell'utente
+    private String username; // Nome utente
+    private String password; // Password dell'utente
+
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
     @ElementCollection(fetch = FetchType.EAGER) // Raccoglie una collezione di elementi con caricamento eager
     @Enumerated(EnumType.STRING) // Salva il ruolo come stringa nel database
     private Set<Role> roles; // Ruoli dell'utente (es. ADMIN, USER)
-	
+
     @Override // Sovrascrive il metodo di UserDetails
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Converte i ruoli in GrantedAuthority per la gestione della sicurezza
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name())) // Converti ogni ruolo in un'istanza di SimpleGrantedAuthority
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name())) // Converti ogni ruolo in un'istanza di
+                                                                                // SimpleGrantedAuthority
                 .collect(Collectors.toSet()); // Raccoglie e restituisce come set
     }
 }

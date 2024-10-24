@@ -1,3 +1,4 @@
+//OK
 package it.dotit.demo.auth;
 
 import lombok.AllArgsConstructor;
@@ -10,11 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateUserRequest {
-	
+
 	private String oldUsername;
 
 	private String username;
-	
+
 	private String password;
-	
+
 }

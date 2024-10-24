@@ -1,3 +1,4 @@
+//OK
 package it.dotit.demo.config;
 
 import org.springframework.context.annotation.Bean;
@@ -22,15 +23,18 @@ public class ApplicationConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(); // Crea un'istanza di DaoAuthenticationProvider
-        authProvider.setUserDetailsService(userDetailsService()); // Imposta il UserDetailsService per recuperare i dettagli dell'utente
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(); // Crea un'istanza di
+                                                                                  // DaoAuthenticationProvider
+        authProvider.setUserDetailsService(userDetailsService()); // Imposta il UserDetailsService per recuperare i
+                                                                  // dettagli dell'utente
         authProvider.setPasswordEncoder(passwordEncoder()); // Imposta il PasswordEncoder per la codifica delle password
         return authProvider; // Restituisce il provider di autenticazione configurato
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager(); // Recupera e restituisce il AuthenticationManager dalla configurazione fornita
+        return config.getAuthenticationManager(); // Recupera e restituisce il AuthenticationManager dalla
+                                                  // configurazione fornita
     }
 
     @Bean
@@ -41,6 +45,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username) // Recupera l'utente per nome utente dal repository
-                .orElseThrow(() -> new UsernameNotFoundException("utente non trovato")); // Lancia un'eccezione se l'utente non viene trovato
+                .orElseThrow(() -> new UsernameNotFoundException("utente non trovato")); // Lancia un'eccezione se
+                                                                                         // l'utente non viene trovato
     }
 }

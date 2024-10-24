@@ -1,3 +1,4 @@
+//OK
 package it.dotit.demo.auth;
 
 import lombok.AllArgsConstructor;
@@ -14,5 +15,5 @@ public class RegisterRequest {
 
 	private String username;
 	private String password;
-	
+
 }
