@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import it.dotit.demo.auth.AuthenticationResponse;
 import it.dotit.demo.auth.RegisterRequest;
 import it.dotit.demo.auth.UpdateUserRequest;
+import it.dotit.demo.exceptions.myExceptions.UserNotFoundException;
 import it.dotit.demo.model.Role;
 import it.dotit.demo.service.AuthenticationService;
 import it.dotit.demo.service.CrudUserService;
