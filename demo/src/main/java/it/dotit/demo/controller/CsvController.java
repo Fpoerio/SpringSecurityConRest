@@ -16,12 +16,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-
-import com.opencsv.exceptions.CsvBadConverterException;
-
-
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,17 +30,49 @@ public class CsvController {
     @Value("${application.pathTxt}")
     private String pathTxt;
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Operation(
+        description = "endpoint post per import di un csv",
+        summary = "Questo è il riassunto per l'endpoint import",
+        responses = {
+            @ApiResponse(
+                description = "import effettuato con successo",
+                responseCode = "200"
+            ),
+            @ApiResponse(
+                description = "Devi inserire un file zip con un csv ben strutturato",
+                responseCode = "400"  
+            )
+        }
+    )
     @PostMapping("/import")
     public ResponseEntity<String> importCSV(@RequestParam String filePath){
-        try {
-            csvservice.importCSV(filePath); // Assicurati che questo sia il metodo corretto
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        csvservice.importCSV(filePath); // Assicurati che questo sia il metodo corretto
+
         return ResponseEntity.ok("Importazione completata!");
     }
 
-    @PostMapping("/downloadCsvEliminati")
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+
+    @Operation(
+        description = "endpoint post per il download dei csv eliminati",
+        summary = "Questo è il riassunto per l'endpoint downloadCsvEliminati",
+        responses = {
+            @ApiResponse(
+                description = "download effettuato con successo",
+                responseCode = "200"
+            ),
+            @ApiResponse(
+                description = "file non trovato",
+                responseCode = "404"  
+            )
+        }
+    )
+    @GetMapping("/downloadCsvEliminati")
     public ResponseEntity<Resource> fileTxt() {
         File fileUtentiEliminati = new File(pathTxt);
         if (!fileUtentiEliminati.exists()) {
@@ -56,4 +84,5 @@ public class CsvController {
                 .header("Content-Type", "text/plain") // Imposta il tipo di contenuto
                 .body(resource);
     }
+
 }

@@ -21,6 +21,7 @@ import it.dotit.demo.auth.AuthenticationResponse; // Classe per la risposta di a
 import it.dotit.demo.auth.RegisterRequest; // Classe per la richiesta di registrazione
 import it.dotit.demo.config.JwtService; // Servizio per generare e validare token JWT
 import it.dotit.demo.exceptions.myExceptions.InvalidCredentialsException;
+import it.dotit.demo.exceptions.myExceptions.MissingFieldsException;
 import it.dotit.demo.exceptions.myExceptions.UsernameAlreadyExistsException;
 import it.dotit.demo.model.Role; // Classe per gestire i ruoli degli utenti
 import it.dotit.demo.model.Token; // Classe per rappresentare i token
@@ -48,51 +49,62 @@ public class AuthenticationService {
 
 	// Metodo per registrare un nuovo utente
 	public AuthenticationResponse register(RegisterRequest request, Role role) {
-		if (!repository.existsByUsername(request.getUsername())) { // Verifica se l'utente esiste già
-			Set<Role> roles = new HashSet<>(); // Crea un insieme per i ruoli
-			roles.add(role); // Aggiunge il ruolo USER
-			User us = User.builder() // Costruisce un nuovo oggetto User
-					.username(request.getUsername()) // Imposta il nome utente
-					.password(passwordEncoder.encode(request.getPassword())) // Imposta e codifica la password
-					.roles(roles) // Imposta i ruoli dell'utente
-					.build(); // Costruisce l'oggetto User
+		if(request.getPassword()!=null && !request.getPassword().isEmpty() && request.getUsername()!=null && !request.getUsername().isEmpty()){
+			if (!repository.existsByUsername(request.getUsername())) { // Verifica se l'utente esiste già
+				Set<Role> roles = new HashSet<>(); // Crea un insieme per i ruoli
+				roles.add(role); // Aggiunge il ruolo USER
+				User us = User.builder() // Costruisce un nuovo oggetto User
+						.username(request.getUsername()) // Imposta il nome utente
+						.password(passwordEncoder.encode(request.getPassword())) // Imposta e codifica la password
+						.roles(roles) // Imposta i ruoli dell'utente
+						.build(); // Costruisce l'oggetto User
 
-			var savedUser = repository.save(us); // Salva l'utente nel database
-			String jwtToken = jwtService.generateToken(us); // Genera un token JWT
-			saveUserToken(savedUser, jwtToken); // Salva il token dell'utente
-			String refreshToken = jwtService.generateRefreshToken(us); // Genera un refresh token
-			return AuthenticationResponse.builder() // Costruisce la risposta di autenticazione
-					.accessToken(jwtToken) // Imposta il token nella risposta
-					.refreshToken(refreshToken) // Imposta il refresh token nella risposta
-					.build(); // Costruisce l'oggetto AuthenticationResponse
-		} else {
-			throw new UsernameAlreadyExistsException("username già esistente");
+				var savedUser = repository.save(us); // Salva l'utente nel database
+				String jwtToken = jwtService.generateToken(us); // Genera un token JWT
+				saveUserToken(savedUser, jwtToken); // Salva il token dell'utente
+				String refreshToken = jwtService.generateRefreshToken(us); // Genera un refresh token
+				return AuthenticationResponse.builder() // Costruisce la risposta di autenticazione
+						.accessToken(jwtToken) // Imposta il token nella risposta
+						.refreshToken(refreshToken) // Imposta il refresh token nella risposta
+						.build(); // Costruisce l'oggetto AuthenticationResponse
+			} else {
+				throw new UsernameAlreadyExistsException("username già esistente");
+			}
+		}else{
+			throw new MissingFieldsException("compila tutti i campi");
 		}
+
 	}
 
 	// Metodo per autenticare un utente esistente
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
-		try {
-			authenticationManager.authenticate( // Esegue l'autenticazione dell'utente
-					new UsernamePasswordAuthenticationToken( // Crea un token di autenticazione
-							request.getUsername(), // Nome utente dalla richiesta
-							request.getPassword() // Password dalla richiesta
-					));
-		} catch (BadCredentialsException e) {
-			throw new InvalidCredentialsException("Nome utente o password non validi."); // Lancia un'eccezione
-																							// personalizzata
+
+		if(request.getUsername()!=null&&!request.getUsername().isEmpty()&&request.getPassword()!=null&&!request.getPassword().isEmpty()){
+			try {
+				authenticationManager.authenticate( // Esegue l'autenticazione dell'utente
+						new UsernamePasswordAuthenticationToken( // Crea un token di autenticazione
+								request.getUsername(), // Nome utente dalla richiesta
+								request.getPassword() // Password dalla richiesta
+						));
+			} catch (BadCredentialsException e) {
+				throw new InvalidCredentialsException("Nome utente o password non validi."); // Lancia un'eccezione
+																								// personalizzata
+			}
+
+			User us = repository.findByUsername(request.getUsername()) // Trova l'utente per nome utente
+					.orElseThrow(); // Lancia un'eccezione se l'utente non esiste
+			String jwtToken = jwtService.generateToken(us); // Genera un token JWT per l'utente
+			revokeAllUserTokens(us); // Revoca i token esistenti per l'utente
+			saveUserToken(us, jwtToken); // Salva il nuovo token per l'utente
+			String refreshToken = jwtService.generateRefreshToken(us); // Genera un refresh token
+			return AuthenticationResponse.builder() // Costruisce la risposta di autenticazione
+					.accessToken(jwtToken) // Imposta il token nella risposta
+					.refreshToken(refreshToken) // Imposta il refresh token nella risposta
+					.build(); // Costruisce l'oggetto AuthenticationResponse			
+		}else{
+			throw new MissingFieldsException("compila tutti i campi");
 		}
 
-		User us = repository.findByUsername(request.getUsername()) // Trova l'utente per nome utente
-				.orElseThrow(); // Lancia un'eccezione se l'utente non esiste
-		String jwtToken = jwtService.generateToken(us); // Genera un token JWT per l'utente
-		revokeAllUserTokens(us); // Revoca i token esistenti per l'utente
-		saveUserToken(us, jwtToken); // Salva il nuovo token per l'utente
-		String refreshToken = jwtService.generateRefreshToken(us); // Genera un refresh token
-		return AuthenticationResponse.builder() // Costruisce la risposta di autenticazione
-				.accessToken(jwtToken) // Imposta il token nella risposta
-				.refreshToken(refreshToken) // Imposta il refresh token nella risposta
-				.build(); // Costruisce l'oggetto AuthenticationResponse
 	}
 
 	// Salva il token dell'utente nel database

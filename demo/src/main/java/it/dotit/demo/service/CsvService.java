@@ -39,7 +39,7 @@ public class CsvService {
    private String pathTxt;
 
     @Transactional
-    public void importCSV(String filePath) throws CsvBadConverterException, IllegalStateException, IOException {
+    public void importCSV(String filePath){
         File zipFile = new File(filePath);
 
         // Verifica se il file esiste ed è un file ZIP valido
@@ -77,6 +77,7 @@ public class CsvService {
         } catch (IOException e) {
 
             logger.error("Errore durante la lettura del file ZIP: {}", e.getMessage());
+            
         }
 
         // Riprocessa il file ZIP per analizzare i dati CSV
@@ -103,7 +104,7 @@ public class CsvService {
                 syncCsvData(newList);
             }
         } catch (IOException e) {
-
+            
             logger.error("Errore durante la lettura del file ZIP: {}", e.getMessage());
         }
     }

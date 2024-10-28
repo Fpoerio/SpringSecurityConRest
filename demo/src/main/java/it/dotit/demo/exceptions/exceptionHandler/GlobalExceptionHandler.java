@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import it.dotit.demo.exceptions.myExceptions.UserNotFoundException;
 import it.dotit.demo.exceptions.myExceptions.UsernameAlreadyExistsException;
 import it.dotit.demo.exceptions.myExceptions.InvalidCredentialsException;
+import it.dotit.demo.exceptions.myExceptions.MissingFieldsException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,6 +34,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MissingFieldsException.class)
+    public ResponseEntity<String> handleMissingFieldsException(MissingFieldsException ex){
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
     }
 
 }
