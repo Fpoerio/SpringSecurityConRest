@@ -6,7 +6,6 @@ import it.dotit.demo.repository.CsvRepository;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
-import com.opencsv.exceptions.CsvBadConverterException;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

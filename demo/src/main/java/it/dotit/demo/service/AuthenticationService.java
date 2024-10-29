@@ -5,7 +5,6 @@ import java.util.HashSet; // Importa HashSet per collezioni di oggetti unici
 import java.util.Set; // Importa Set per gestire collezioni di oggetti unici
 
 import org.springframework.http.HttpHeaders; // Importa HttpHeaders per gestire le intestazioni delle richieste
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager; // Importa per gestire l'autenticazione
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Rappresenta una richiesta di autenticazione

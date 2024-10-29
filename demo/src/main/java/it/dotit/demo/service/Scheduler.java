@@ -32,7 +32,7 @@ public class Scheduler {
 
 	private final String pathTxt = "C:\\Users\\Fabio\\git\\springSecurityRest\\demo\\src\\main\\resources\\txtCsvEliminati.txt";
 
-	@Scheduled(cron = "0 0 12 * * ?") // Esegue il controllo ogni giorno a mezzogiorno
+	@Scheduled(cron = "0 0 12 * * MON") // Esegue il controllo ogni lunedì a mezzogiorno
 	private void removeOldRecords() throws FileNotFoundException, java.io.IOException {
 		LocalDate thresholdDate = LocalDate.now().minusDays(30); // Calcola la data di soglia
 		List<String> linesToKeep = new ArrayList<>(); // Lista per le righe da mantenere

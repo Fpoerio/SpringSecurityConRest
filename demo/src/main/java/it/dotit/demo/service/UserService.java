@@ -3,10 +3,9 @@ package it.dotit.demo.service; // Pacchetto per i servizi relativi agli utenti
 import org.springframework.security.core.userdetails.UserDetails; // Importa l'interfaccia per i dettagli dell'utente
 import org.springframework.security.core.userdetails.UserDetailsService; // Importa l'interfaccia per il servizio dei dettagli dell'utente
 import org.springframework.security.core.userdetails.UsernameNotFoundException; // Importa l'eccezione per utente non trovato
-import org.springframework.security.crypto.password.PasswordEncoder; // Importa l'interfaccia per la codifica delle password
+
 import org.springframework.stereotype.Service; // Importa l'annotazione Service per indicare che è un servizio
 
-import it.dotit.demo.auth.UpdateUserRequest;
 import it.dotit.demo.model.User; // Importa la classe User per rappresentare gli utenti
 import it.dotit.demo.repository.UserRepository; // Importa la repository degli utenti
 import lombok.RequiredArgsConstructor;
