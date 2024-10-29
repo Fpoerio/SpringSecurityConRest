@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+//classe per richiesta di aggiornamento credenziali utente
 @Data
 @Builder
 @AllArgsConstructor

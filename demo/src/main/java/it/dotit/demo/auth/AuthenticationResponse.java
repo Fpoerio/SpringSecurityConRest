@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-//Classe per risposta all'autenticazione con il token
 
+//Classe per risposta all'autenticazione con access token e refresh token
 @Data
 @Builder
 @AllArgsConstructor
